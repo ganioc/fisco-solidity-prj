@@ -89,48 +89,46 @@ contract POSIn {
             }
         }
     }
-    /*
+ 
     function getById(string berthId)
         public
         returns (
-            int256,
-            string,
-            string,
+            bytes32,
+            bytes32,
+            uint16,
+            bytes32 ,
+            bytes32/*,
+            uint256,
             uint256,
             string,
-            string,
-            uint256,
-            uint256,
-            string,
-            string
+            string*/
         )
     {
         Table table = openTable();
 
-        Condition condition = table.newCondition();
-        condition.EQ("berth_id", berthId);
+        // Condition condition = ;
+        // condition.EQ("berth_id", berthId);
 
-        Entries entries = table.select("berth_id", condition);
+        Entries entries = table.select(berthId, table.newCondition());
 
         if (0 == uint256(entries.size())) {
-            return (-1, "", "", 0, "", "", 0, 0, "", "");
+            return ( "", "", 0, "", ""/*, 0, 0, "", ""*/);
         } else {
             Entry entry = entries.get(0);
             return (
-                0,
-                entry.getString("berth_id"),
-                entry.getString("in_itme"),
-                uint256(entry.getInt("in_time_type")),
-                entry.getString("in_type"),
-                entry.getString("plate_id"),
-                uint256(entry.getInt("prepay_len")),
-                uint256(entry.getInt("prepay_money")),
-                entry.getString("vehicle_type"),
-                entry.getString("in_pic_hash")
+                entry.getBytes32("berth_id")  ,
+                entry.getBytes32("in_itme")  ,
+                uint16(entry.getUInt("in_time_type")) ,
+                entry.getBytes32("in_type"),
+                entry.getBytes32("plate_id")// ,
+                // uint256(entry.getInt("prepay_len")),
+                // uint256(entry.getInt("prepay_money")),
+                // entry.getString("vehicle_type"),
+                // entry.getString("in_pic_hash")
             );
         }
     }
-
+   /*
     function getByIndex(uint256 id)
         public
         constant

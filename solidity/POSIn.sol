@@ -106,6 +106,7 @@ contract POSIn {
     {
         Table table = openTable();
         Condition condition = table.newCondition();
+        // condition.EQ("berth_id", "hello");
         Entries entries = table.select(berthId, condition);
 
         if (0 == uint256(entries.size())) {
@@ -125,8 +126,8 @@ contract POSIn {
             );
         }
     }
-   /*
-    function getByIndex(uint256 id)
+   
+    function getByIndex(int256 id)
         public
         constant
         returns (
@@ -146,24 +147,24 @@ contract POSIn {
         Condition condition = table.newCondition();
         condition.EQ("index", id);
 
-        Entries entries = table.select("berth_id", condition);
+        Entries entries = table.select("hi", condition);
 
         if (0 == uint256(entries.size())) {
-            return ("", "", 0, "", "", 0, 0, "", "");
+            return ("", "", 0, 0, "", 0, 0, 0, "");
         } else {
             Entry entry = entries.get(0);
             return (
-                entry.getString("berth_id"),
-                entry.getString("in_itme"),
-                uint256(entry.getInt("in_time_type")),
-                entry.getString("in_type"),
-                entry.getString("plate_id"),
-                uint256(entry.getInt("prepay_len")),
-                uint256(entry.getInt("prepay_money")),
-                entry.getString("vehicle_type"),
-                entry.getString("in_pic_hash")
+                entry.getBytes32("berth_id")  ,
+                entry.getBytes32("in_itme")  ,
+                uint32(entry.getUInt("in_time_type")) ,
+                uint32(entry.getUInt("in_type")),
+                entry.getBytes32("plate_id"),
+                uint32(entry.getUInt("prepay_len")),
+                uint32(entry.getUInt("prepay_money")),
+                uint32(entry.getUInt("vehicle_type")),
+                entry.getBytes32("in_pic_hash")
             );
         }
     }
-    */
+    
 }

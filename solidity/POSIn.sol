@@ -52,11 +52,11 @@ contract POSIn {
         string berthId,
         string inTime,
         uint256 inTimeType,
-        string inType,
+        uint256 inType,
         string plateId,
         uint256 prepayLen,
         uint256 prepayMoney,
-        string vehicleType,
+        uint256 vehicleType,
         string inPicHash
     ) public returns (int256) {
 
@@ -95,13 +95,13 @@ contract POSIn {
         returns (
             bytes32,
             bytes32,
-            uint16,
-            bytes32 ,
-            bytes32/*,
-            uint256,
-            uint256,
-            string,
-            string*/
+            uint32,
+            uint32 ,
+            bytes32,
+            uint32,
+            uint32,
+            uint32,
+            bytes32
         )
     {
         Table table = openTable();
@@ -112,19 +112,19 @@ contract POSIn {
         Entries entries = table.select(berthId, table.newCondition());
 
         if (0 == uint256(entries.size())) {
-            return ( "", "", 0, "", ""/*, 0, 0, "", ""*/);
+            return ( "", "", 0, 0, "", 0, 0, 0, "");
         } else {
             Entry entry = entries.get(0);
             return (
                 entry.getBytes32("berth_id")  ,
                 entry.getBytes32("in_itme")  ,
-                uint16(entry.getUInt("in_time_type")) ,
-                entry.getBytes32("in_type"),
-                entry.getBytes32("plate_id")// ,
-                // uint256(entry.getInt("prepay_len")),
-                // uint256(entry.getInt("prepay_money")),
-                // entry.getString("vehicle_type"),
-                // entry.getString("in_pic_hash")
+                uint32(entry.getUInt("in_time_type")) ,
+                uint32(entry.getUInt("in_type")),
+                entry.getBytes32("plate_id"),
+                uint32(entry.getUInt("prepay_len")),
+                uint32(entry.getUInt("prepay_money")),
+                uint32(entry.getUInt("vehicle_type")),
+                entry.getBytes32("in_pic_hash")
             );
         }
     }

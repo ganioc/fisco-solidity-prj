@@ -105,11 +105,8 @@ contract POSIn {
         )
     {
         Table table = openTable();
-
-        // Condition condition = ;
-        // condition.EQ("berth_id", berthId);
-
-        Entries entries = table.select(berthId, table.newCondition());
+        Condition condition = table.newCondition();
+        Entries entries = table.select(berthId, condition);
 
         if (0 == uint256(entries.size())) {
             return ( "", "", 0, 0, "", 0, 0, 0, "");
@@ -133,16 +130,15 @@ contract POSIn {
         public
         constant
         returns (
-            int256,
-            string,
-            string,
-            uint256,
-            string,
-            string,
-            uint256,
-            uint256,
-            string,
-            string
+            bytes32,
+            bytes32,
+            uint32,
+            uint32 ,
+            bytes32,
+            uint32,
+            uint32,
+            uint32,
+            bytes32
         )
     {
         Table table = openTable();
@@ -153,11 +149,10 @@ contract POSIn {
         Entries entries = table.select("berth_id", condition);
 
         if (0 == uint256(entries.size())) {
-            return (-1, "", "", 0, "", "", 0, 0, "", "");
+            return ("", "", 0, "", "", 0, 0, "", "");
         } else {
             Entry entry = entries.get(0);
             return (
-                0,
                 entry.getString("berth_id"),
                 entry.getString("in_itme"),
                 uint256(entry.getInt("in_time_type")),

@@ -29,8 +29,8 @@ contract POSIn {
 
         tf.createTable(
             "pos_in",
-            "berth_id",
-            "index,in_time,in_time_type,in_type,plate_id,prepay_len,prepay_money,vehicle_type,in_pic_hash"
+            "loc",
+            "berth_id,index,in_time,in_time_type,in_type,plate_id,prepay_len,prepay_money,vehicle_type,in_pic_hash"
         );
     }
 

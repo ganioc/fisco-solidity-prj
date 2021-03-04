@@ -1,26 +1,12 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
-import "./Tablle.sol";
+import "./Table.sol";
 
 contract POSIn {
-    // index of records
-
-    struct InRecord {
-        string berth_id;
-        string in_time;
-        uint256 in_time_type;
-        string in_type;
-        string plate_id;
-        uint256 prepay_len;
-        uint256 prepay_money;
-        string vehicle_type;
-        string in_pic_hash;
-    }
-
     uint256 index;
     // owner of contract
     address private owner;
-    string constant TABLE_NAME = "pos_in";
+    // string constant "pos_in" = "pos_in";
 
     // event for EVM logging
     event OwnerSet(address indexed oldOwner, address indexed newOwner);
@@ -42,23 +28,15 @@ contract POSIn {
         TableFactory tf = TableFactory(0x1001);
 
         tf.createTable(
-            TABLE_NAME,
+            "pos_in",
             "berth_id",
-            "index",
-            "in_time",
-            "in_time_type",
-            "in_type",
-            "plate_id",
-            "prepay_len",
-            "prepay_money",
-            "vehicle_type",
-            "in_pic_hash"
+            "index,in_time,in_time_type,in_type,plate_id,prepay_len,prepay_money,vehicle_type,in_pic_hash"
         );
     }
 
     function openTable() private returns (Table) {
         TableFactory tf = TableFactory(0x1001);
-        Table table = tf.openTable(TABLE_NAME);
+        Table table = tf.openTable("pos_in");
         return table;
     }
 
@@ -67,7 +45,7 @@ contract POSIn {
     }
 
     function getOwner() public view returns (address) {
-        return onwer;
+        return owner;
     }
 
     function insertRecord(
@@ -81,17 +59,13 @@ contract POSIn {
         string vehicleType,
         string inPicHash
     ) public returns (int256) {
-        int256 ret_code = 0;
-        int256 ret = 0;
-        string ret_info = "";
 
         Table table = openTable();
-
+        // Condition condition = table.newCondition();
         Entries entries = table.select(berthId, table.newCondition());
 
         if (entries.size() != 0) {
-            ret_code = -1;
-            ret_info = "Already exists.";
+            return -1;
         } else {
             Entry entry = table.newEntry();
             entry.set("berth_id", berthId);
@@ -109,109 +83,94 @@ contract POSIn {
             int256 count = table.insert(berthId, entry);
 
             if (count == 1) {
-                ret_code = 0;
+                return 0;
             } else {
-                ret_code = -2;
-                ret_info = "Table insertion failed.";
+                return -2;
             }
         }
-        emit InsertEvent(ret_code, ret_info);
-        return ret_code;
     }
-
+    /*
     function getById(string berthId)
         public
-        constant
-        returns (int256, InRecord[])
+        returns (
+            int256,
+            string,
+            string,
+            uint256,
+            string,
+            string,
+            uint256,
+            uint256,
+            string,
+            string
+        )
     {
-        InRecord[] records = [];
-
         Table table = openTable();
 
-        Condition = table.newCondition();
+        Condition condition = table.newCondition();
         condition.EQ("berth_id", berthId);
 
         Entries entries = table.select("berth_id", condition);
 
         if (0 == uint256(entries.size())) {
-            return (-1, records);
+            return (-1, "", "", 0, "", "", 0, 0, "", "");
         } else {
             Entry entry = entries.get(0);
-
-            records.push(
-                InRecord({
-                    berth_id: entry.getString("berth_id"),
-                    in_time: entry.getString("in_itme"),
-                    in_time_type: uint256(entry.getInt("in_time_type")),
-                    in_type: entry.getString("in_type"),
-                    plate_id: entry.getString("plate_id"),
-                    prepay_len: uint256(entry.getInt("prepay_len")),
-                    prepay_money: uint256(entry.getInt("prepay_money")),
-                    vehicle_type: entry.getString("vehicle_type"),
-                    in_pic_hash: entry.getString("in_pic_hash")
-                })
+            return (
+                0,
+                entry.getString("berth_id"),
+                entry.getString("in_itme"),
+                uint256(entry.getInt("in_time_type")),
+                entry.getString("in_type"),
+                entry.getString("plate_id"),
+                uint256(entry.getInt("prepay_len")),
+                uint256(entry.getInt("prepay_money")),
+                entry.getString("vehicle_type"),
+                entry.getString("in_pic_hash")
             );
-            return (0, records);
         }
     }
 
-    function getByPage(uint256 page_index, uint256 page_size)
+    function getByIndex(uint256 id)
         public
         constant
         returns (
+            int256,
+            string,
+            string,
+            uint256,
+            string,
+            string,
             uint256,
             uint256,
-            uint256,
-            InRecord[]
+            string,
+            string
         )
     {
-        InRecord[] records = [];
-        uint256 pindex = 0;
-        uint256 psize = 20;
-
-        if (page_size < 0 || page_size > 25) {
-            psize = 25;
-        } else {
-            psize = page_size;
-        }
-
-        if (page_index < 0) {
-            pindex = 0;
-        } else if (page_index >= index) {
-            pindex = index - 1;
-        } else {
-            pindex = page_index;
-        }
-
         Table table = openTable();
 
-        Condition = table.newCondition();
-        // condition.GE("index", pindex);
-        condition.limit(pindex, psize);
+        Condition condition = table.newCondition();
+        condition.EQ("index", id);
 
         Entries entries = table.select("berth_id", condition);
-        uint256 len = entries.size();
 
-        if(0 == len){
-            return(index,pindex, psize, records);
-        }else{
-            for(int i = 0; i< len; i++){
-                Entry entry = entries.get(i);
-                records.push(
-                    InRecord({
-                    berth_id: entry.getString("berth_id"),
-                    in_time: entry.getString("in_itme"),
-                    in_time_type: uint256(entry.getInt("in_time_type")),
-                    in_type: entry.getString("in_type"),
-                    plate_id: entry.getString("plate_id"),
-                    prepay_len: uint256(entry.getInt("prepay_len")),
-                    prepay_money: uint256(entry.getInt("prepay_money")),
-                    vehicle_type: entry.getString("vehicle_type"),
-                    in_pic_hash: entry.getString("in_pic_hash")
-                    })
-                );
-            }
-            return(index, pindex, psize, records);
+        if (0 == uint256(entries.size())) {
+            return (-1, "", "", 0, "", "", 0, 0, "", "");
+        } else {
+            Entry entry = entries.get(0);
+            return (
+                0,
+                entry.getString("berth_id"),
+                entry.getString("in_itme"),
+                uint256(entry.getInt("in_time_type")),
+                entry.getString("in_type"),
+                entry.getString("plate_id"),
+                uint256(entry.getInt("prepay_len")),
+                uint256(entry.getInt("prepay_money")),
+                entry.getString("vehicle_type"),
+                entry.getString("in_pic_hash")
+            );
         }
     }
+    */
 }

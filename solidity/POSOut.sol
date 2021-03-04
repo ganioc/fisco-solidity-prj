@@ -1,8 +1,11 @@
 pragma solidity ^0.4.24;
 
-import "./Tablle.sol";
+import "./Table.sol";
 
 contract POSOut {
+    // owner of contract
+    address private owner;
+
     function createTable() private {
         TableFactory tf = TableFactory(0x1001);
 

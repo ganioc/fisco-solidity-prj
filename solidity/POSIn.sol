@@ -47,7 +47,7 @@ contract POSIn {
     function getOwner() public view returns (address) {
         return owner;
     }
-
+/*
     function insertRecord(
         string berthId,
         string inTime,
@@ -166,5 +166,5 @@ contract POSIn {
             );
         }
     }
-    
+  */  
 }

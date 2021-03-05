@@ -61,10 +61,16 @@ contract POSIn {
         return LOC;
     }
 
-    function _get(string berthId) private returns (Entries) {
+    function _get(string name, string berthId) private returns (Entries) {
         Table table = openTable();
         Condition condition = table.newCondition();
-        condition.EQ("berth_id", berthId);
+        condition.EQ(name, berthId);
+        return table.select(LOC, condition);
+    }
+    function _getByNum(string name, int256 num) private returns (Entries) {
+        Table table = openTable();
+        Condition condition = table.newCondition();
+        condition.EQ(name, num);
         return table.select(LOC, condition);
     }
 
@@ -111,7 +117,7 @@ contract POSIn {
         int256 vehicleType,
         string inPicHash
     ) public returns (ErrCode) {
-        Entries entries = _get(berthId);
+        Entries entries = _get("berth_id", berthId);
 
         if (entries.size() != 0) {
             return ErrCode.EXISTS;
@@ -145,7 +151,7 @@ contract POSIn {
             string
         )
     {
-        Entries entries = _get(berthId);
+        Entries entries = _get("berth_id", berthId);
         if (entries.size() != 0) {
             return ("", "", 0, 0, "", 0, 0, 0, "");
         } else {
@@ -163,82 +169,40 @@ contract POSIn {
             );
         }
     }
-    /*
-    function getById(string berthId)
+
+    function getByIndex(int256 mIndex)
         public
         returns (
-            bytes32,
-            bytes32,
-            uint32,
-            uint32 ,
-            bytes32,
-            uint32,
-            uint32,
-            uint32,
-            bytes32
+            string,
+            string,
+            int256,
+            int256,
+            string,
+            int256,
+            int256,
+            int256,
+            string
         )
     {
-        Table table = openTable();
-        Condition condition = table.newCondition();
-        // condition.EQ("berth_id", "hello");
-        Entries entries = table.select(berthId, condition);
-
-        if (0 == uint256(entries.size())) {
-            return ( "", "", 0, 0, "", 0, 0, 0, "");
-        } else {
-            Entry entry = entries.get(0);
-            return (
-                entry.getBytes32("berth_id")  ,
-                entry.getBytes32("in_itme")  ,
-                uint32(entry.getUInt("in_time_type")) ,
-                uint32(entry.getUInt("in_type")),
-                entry.getBytes32("plate_id"),
-                uint32(entry.getUInt("prepay_len")),
-                uint32(entry.getUInt("prepay_money")),
-                uint32(entry.getUInt("vehicle_type")),
-                entry.getBytes32("in_pic_hash")
-            );
+        if( mIndex < 0 || uint256(mIndex) >  index){
+            return ("", "", 0, 0, "", 0, 0, 0, "");
         }
-    }
-   
-    function getByIndex(int256 id)
-        public
-        constant
-        returns (
-            bytes32,
-            bytes32,
-            uint32,
-            uint32 ,
-            bytes32,
-            uint32,
-            uint32,
-            uint32,
-            bytes32
-        )
-    {
-        Table table = openTable();
-
-        Condition condition = table.newCondition();
-        condition.EQ("index", id);
-
-        Entries entries = table.select("hi", condition);
-
-        if (0 == uint256(entries.size())) {
+        Entries entries = _getByNum("index", mIndex);
+        if (entries.size() != 0) {
             return ("", "", 0, 0, "", 0, 0, 0, "");
         } else {
             Entry entry = entries.get(0);
             return (
-                entry.getBytes32("berth_id")  ,
-                entry.getBytes32("in_itme")  ,
-                uint32(entry.getUInt("in_time_type")) ,
-                uint32(entry.getUInt("in_type")),
-                entry.getBytes32("plate_id"),
-                uint32(entry.getUInt("prepay_len")),
-                uint32(entry.getUInt("prepay_money")),
-                uint32(entry.getUInt("vehicle_type")),
-                entry.getBytes32("in_pic_hash")
+                entry.getString("berth_id"),
+                entry.getString("in_itme"),
+                int256(entry.getInt("in_time_type")),
+                int256(entry.getInt("in_type")),
+                entry.getString("plate_id"),
+                int256(entry.getInt("prepay_len")),
+                int256(entry.getInt("prepay_money")),
+                int256(entry.getInt("vehicle_type")),
+                entry.getString("in_pic_hash")
             );
         }
     }
-  */
 }

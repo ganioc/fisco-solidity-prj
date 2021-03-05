@@ -4,8 +4,8 @@ import "./Table.sol";
 import "./POSLib.sol";
 
 contract POSIn {
-    // using ErrCode for POSLib.ErrCode;
-    // using ErrCode for POSLib.ErrCode;
+
+    using POSLib for POSLib.ErrCode;
 
     uint256 index;
     // owner of contract

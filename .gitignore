@@ -1,3 +1,5 @@
 .compiled/
 *.bin
 *.abi
+sdk/abi/
+sdk/bin/

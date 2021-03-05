@@ -83,4 +83,36 @@ contract PIn is POSBase {
                 );
         }
     }
+    function getById(string berthId)
+        public
+        returns (
+            string,
+            string,
+            int256,
+            int256,
+            string,
+            int256,
+            int256,
+            int256,
+            string
+        )
+    {
+        Entries entries = getByStr(TABLE_NAME, "berth_id", berthId);
+        if (entries.size() != 0) {
+            return ("", "", 0, 0, "", 0, 0, 0, "");
+        } else {
+            Entry entry = entries.get(0);
+            return (
+                entry.getString("berth_id"),
+                entry.getString("in_itme"),
+                int256(entry.getInt("in_time_type")),
+                int256(entry.getInt("in_type")),
+                entry.getString("plate_id"),
+                int256(entry.getInt("prepay_len")),
+                int256(entry.getInt("prepay_money")),
+                int256(entry.getInt("vehicle_type")),
+                entry.getString("in_pic_hash")
+            );
+        }
+    }
 }

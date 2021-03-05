@@ -7,6 +7,15 @@ contract POSIn {
     // owner of contract
     address private owner;
     // string constant "pos_in" = "pos_in";
+    string constant LOC = "shanghai";
+
+    enum ErrCode{
+        OK ,    // 0
+        FAIL,   // 1
+        EMPTY,  // 2
+        DBFAIL, // 3
+        EXISTS  // 4
+    }
 
     // event for EVM logging
     event OwnerSet(address indexed oldOwner, address indexed newOwner);
@@ -29,7 +38,7 @@ contract POSIn {
 
         tf.createTable(
             "pos_in",
-            "loc",
+            LOC,
             "berth_id,index,in_time,in_time_type,in_type,plate_id,prepay_len,prepay_money,vehicle_type,in_pic_hash"
         );
     }
@@ -48,48 +57,69 @@ contract POSIn {
         return owner;
     }
 
+    function getLoc() public view returns (string) {
+        return LOC;
+    }
+
+    function _getRecords(string berthId) private returns (Entries) {
+        Table table = openTable();
+        Condition condition = table.newCondition();
+        condition.EQ("berth_id", berthId);
+        return table.select(LOC, condition);
+    }
+
+    function _insert(        
+        string berthId,
+        string inTime,
+        int256 inTimeType,
+        int256 inType,
+        string plateId,
+        int256 prepayLen,
+        int256 prepayMoney,
+        int256 vehicleType,
+        string inPicHash) private returns (int256) {
+        
+        Table table = openTable();
+        Entry entry = table.newEntry();
+        entry.set("berth_id", berthId);
+        entry.set("index", index);
+        index++;
+        entry.set("in_time", inTime);
+        entry.set("in_time_type", inTimeType);
+        entry.set("in_type", inType);
+        entry.set("plate_id", plateId);
+        entry.set("prepay_len", prepayLen);
+        entry.set("prepay_money", prepayMoney);
+        entry.set("vehicle_type", vehicleType);
+        entry.set("in_pic_hash", inPicHash);
+
+        if(table.insert(LOC, entry) == 1){
+            return ErrCode.OK;
+        }else{
+            return ErrCode.FAIL;
+        }
+    }
+
     function insertRecord(
         string berthId,
         string inTime,
-        uint256 inTimeType,
-        uint256 inType,
+        int256 inTimeType,
+        int256 inType,
         string plateId,
-        uint256 prepayLen,
-        uint256 prepayMoney,
-        uint256 vehicleType,
+        int256 prepayLen,
+        int256 prepayMoney,
+        int256 vehicleType,
         string inPicHash
     ) public returns (int256) {
-
-        Table table = openTable();
-        // Condition condition = table.newCondition();
-        Entries entries = table.select(berthId, table.newCondition());
+        Entries entries = _getRecords(berthId);
 
         if (entries.size() != 0) {
-            return -1;
+            return ErrCode.EXISTS;
         } else {
-            Entry entry = table.newEntry();
-            entry.set("berth_id", berthId);
-            entry.set("index", index);
-            index++;
-            entry.set("in_time", inTime);
-            entry.set("in_time_type", inTimeType);
-            entry.set("in_type", inType);
-            entry.set("plate_id", plateId);
-            entry.set("prepay_len", prepayLen);
-            entry.set("prepay_money", prepayMoney);
-            entry.set("vehicle_type", vehicleType);
-            entry.set("in_pic_hash", inPicHash);
-
-            int256 count = table.insert(berthId, entry);
-
-            if (count == 1) {
-                return 0;
-            } else {
-                return -2;
-            }
+             return _insert(berthId, inTime, inTimeType, inType, plateId, prepayLen, prepayMoney, vehicleType, inPicHash);
         }
     }
- /*
+    /*
     function getById(string berthId)
         public
         returns (
@@ -166,5 +196,5 @@ contract POSIn {
             );
         }
     }
-  */  
+  */
 }

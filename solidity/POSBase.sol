@@ -18,15 +18,26 @@ contract POSBase {
         LOC = loc;
     }
 
+    modifier isOwner() {
+        require(msg.sender == owner, "Caller is not owner");
+        _;
+    }
+
     function getInex() public view returns(uint256){
         return index;
     }
     function getOwner() public view returns(address){
         return owner;
     }
+    function getLoc() public view returns(string){
+        return LOC;
+    }
 
     function getTableFactory() internal returns(TableFactory){
         return TableFactory(0x1001);
+    }
+    function openTable(string tableName) internal returns (Table) {
+        return getTableFactory().openTable(tableName);
     }
 
 }

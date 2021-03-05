@@ -61,7 +61,7 @@ contract POSIn {
         return LOC;
     }
 
-    function _getRecords(string berthId) private returns (Entries) {
+    function _get(string berthId) private returns (Entries) {
         Table table = openTable();
         Condition condition = table.newCondition();
         condition.EQ("berth_id", berthId);
@@ -77,7 +77,7 @@ contract POSIn {
         int256 prepayLen,
         int256 prepayMoney,
         int256 vehicleType,
-        string inPicHash) private returns (int256) {
+        string inPicHash) private returns (ErrCode) {
         
         Table table = openTable();
         Entry entry = table.newEntry();
@@ -110,8 +110,8 @@ contract POSIn {
         int256 prepayMoney,
         int256 vehicleType,
         string inPicHash
-    ) public returns (int256) {
-        Entries entries = _getRecords(berthId);
+    ) public returns (ErrCode) {
+        Entries entries = _get(berthId);
 
         if (entries.size() != 0) {
             return ErrCode.EXISTS;

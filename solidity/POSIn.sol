@@ -9,12 +9,12 @@ contract POSIn {
     // string constant "pos_in" = "pos_in";
     string constant LOC = "shanghai";
 
-    enum ErrCode{
-        OK ,    // 0
-        FAIL,   // 1
-        EMPTY,  // 2
+    enum ErrCode {
+        OK, // 0
+        FAIL, // 1
+        EMPTY, // 2
         DBFAIL, // 3
-        EXISTS  // 4
+        EXISTS // 4
     }
 
     // event for EVM logging
@@ -68,7 +68,7 @@ contract POSIn {
         return table.select(LOC, condition);
     }
 
-    function _insert(        
+    function _insert(
         string berthId,
         string inTime,
         int256 inTimeType,
@@ -77,8 +77,8 @@ contract POSIn {
         int256 prepayLen,
         int256 prepayMoney,
         int256 vehicleType,
-        string inPicHash) private returns (ErrCode) {
-        
+        string inPicHash
+    ) private returns (ErrCode) {
         Table table = openTable();
         Entry entry = table.newEntry();
         entry.set("berth_id", berthId);
@@ -93,9 +93,9 @@ contract POSIn {
         entry.set("vehicle_type", vehicleType);
         entry.set("in_pic_hash", inPicHash);
 
-        if(table.insert(LOC, entry) == 1){
+        if (table.insert(LOC, entry) == 1) {
             return ErrCode.OK;
-        }else{
+        } else {
             return ErrCode.FAIL;
         }
     }
@@ -116,7 +116,51 @@ contract POSIn {
         if (entries.size() != 0) {
             return ErrCode.EXISTS;
         } else {
-             return _insert(berthId, inTime, inTimeType, inType, plateId, prepayLen, prepayMoney, vehicleType, inPicHash);
+            return
+                _insert(
+                    berthId,
+                    inTime,
+                    inTimeType,
+                    inType,
+                    plateId,
+                    prepayLen,
+                    prepayMoney,
+                    vehicleType,
+                    inPicHash
+                );
+        }
+    }
+
+    function getById(string berthId)
+        public
+        returns (
+            string,
+            string,
+            int256,
+            int256,
+            string,
+            int256,
+            int256,
+            int256,
+            string
+        )
+    {
+        Entries entries = _get(berthId);
+        if (entries.size() != 0) {
+            return ("", "", 0, 0, "", 0, 0, 0, "");
+        } else {
+            Entry entry = entries.get(0);
+            return (
+                entry.getString("berth_id"),
+                entry.getString("in_itme"),
+                int256(entry.getInt("in_time_type")),
+                int256(entry.getInt("in_type")),
+                entry.getString("plate_id"),
+                int256(entry.getInt("prepay_len")),
+                int256(entry.getInt("prepay_money")),
+                int256(entry.getInt("vehicle_type")),
+                entry.getString("in_pic_hash")
+            );
         }
     }
     /*

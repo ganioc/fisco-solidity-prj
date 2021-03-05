@@ -21,4 +21,103 @@ contract POut is POSBase {
         );
     }
 
+    function _insert(
+        string berthId,
+        string outTime,
+        int256 shouldPayMoney,
+        string id,
+        string outPicHash
+    ) private returns (POSLib.ErrCode) {
+        Table table = openTable(TABLE_NAME);
+        Entry entry = table.newEntry();
+        entry.set("berth_id", berthId);
+        entry.set("index", index);
+        incIndex();
+        entry.set("out_time", outTime);
+        entry.set("should_pay_money", shouldPayMoney);
+        entry.set("id", id);
+        entry.set("out_pic_hash", outPicHash);
+
+        if (table.insert(LOC, entry) == 1) {
+            return POSLib.ErrCode.OK;
+        } else {
+            return POSLib.ErrCode.FAIL;
+        }
+    }
+
+    function insertRecord(
+        string berthId,
+        string outTime,
+        int256 shouldPayMoney,
+        string id,
+        string outPicHash
+    ) public returns (POSLib.ErrCode) {
+        Entries entries = getByStr(TABLE_NAME, "berth_id", berthId);
+
+        if (entries.size() != 0) {
+            return POSLib.ErrCode.EXISTS;
+        } else {
+            return
+                _insert(
+                    berthId,
+                    outTime,
+                    shouldPayMoney,
+                    id,
+                    outPicHash
+                );
+        }
+    }
+
+    function getById(string berthId)
+        public
+        returns (
+            string,
+            string,
+            int256,
+            string,
+            string
+        )
+    {
+        Entries entries = getByStr(TABLE_NAME, "berth_id", berthId);
+        if (entries.size() != 0) {
+            return ("", "", 0, "", "");
+        } else {
+            Entry entry = entries.get(0);
+            return (
+                entry.getString("berth_id"),
+                entry.getString("out_itme"),
+                int256(entry.getInt("should_pay_money")),
+                entry.getString("id"),
+                entry.getString("out_pic_hash")
+            );
+        }
+    }
+
+    function getByIndex(int256 mIndex)
+        public
+        returns (
+            string,
+            string,
+            int256,
+            string,
+            string
+        )
+    {
+        if (mIndex < 0 || uint256(mIndex) >= index) {
+            return ("", "", 0,  "", "");
+        }
+        Entries entries = getByNum(TABLE_NAME, "index", mIndex);
+        if (entries.size() != 0) {
+            return ("", "", 0, "", "");
+        } else {
+            Entry entry = entries.get(0);
+            return (
+                entry.getString("berth_id"),
+                entry.getString("out_itme"),
+                int256(entry.getInt("should_pay_money")),
+                entry.getString("id"),
+                entry.getString("out_pic_hash")
+            );
+        }
+    }
 }

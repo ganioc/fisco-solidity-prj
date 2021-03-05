@@ -129,7 +129,7 @@ contract PIn is POSBase {
             string
         )
     {
-        if( mIndex < 0 || uint256(mIndex) >  index){
+        if( mIndex < 0 || uint256(mIndex) >=  index){
             return ("", "", 0, 0, "", 0, 0, 0, "");
         }
         Entries entries = getByNum(TABLE_NAME,"index", mIndex);

@@ -1,21 +1,17 @@
 pragma solidity ^0.4.25;
 
 import "./Table.sol";
+import "./POSLib.sol";
 
 contract POSIn {
+    // using ErrCode for POSLib.ErrCode;
+    // using ErrCode for POSLib.ErrCode;
+
     uint256 index;
     // owner of contract
     address private owner;
     // string constant "pos_in" = "pos_in";
     string constant LOC = "shanghai";
-
-    enum ErrCode {
-        OK, // 0
-        FAIL, // 1
-        EMPTY, // 2
-        DBFAIL, // 3
-        EXISTS // 4
-    }
 
     // event for EVM logging
     event OwnerSet(address indexed oldOwner, address indexed newOwner);
@@ -84,7 +80,7 @@ contract POSIn {
         int256 prepayMoney,
         int256 vehicleType,
         string inPicHash
-    ) private returns (ErrCode) {
+    ) private returns (POSLib.ErrCode) {
         Table table = openTable();
         Entry entry = table.newEntry();
         entry.set("berth_id", berthId);
@@ -100,9 +96,9 @@ contract POSIn {
         entry.set("in_pic_hash", inPicHash);
 
         if (table.insert(LOC, entry) == 1) {
-            return ErrCode.OK;
+            return POSLib.ErrCode.OK;
         } else {
-            return ErrCode.FAIL;
+            return POSLib.ErrCode.FAIL;
         }
     }
 
@@ -116,11 +112,11 @@ contract POSIn {
         int256 prepayMoney,
         int256 vehicleType,
         string inPicHash
-    ) public returns (ErrCode) {
+    ) public returns (POSLib.ErrCode) {
         Entries entries = _get("berth_id", berthId);
 
         if (entries.size() != 0) {
-            return ErrCode.EXISTS;
+            return POSLib.ErrCode.EXISTS;
         } else {
             return
                 _insert(

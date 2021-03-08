@@ -6,6 +6,7 @@ import "./POSLib.sol";
 
 contract PPay is POSBase {
     using POSLib for POSLib.ErrCode;
+    event InsertRecordEvent(int256 ret, address account);
 
     string constant TABLE_NAME = "pos_pay";
 
@@ -45,8 +46,10 @@ contract PPay is POSBase {
         entry.set("zero_owe", zeroOwe);
 
         if (table.insert(LOC, entry) == 1) {
+            emit InsertRecordEvent(int256(POSLib.ErrCode.OK), msg.sender);
             return POSLib.ErrCode.OK;
         } else {
+            emit InsertRecordEvent(int256(POSLib.ErrCode.FAIL), msg.sender);
             return POSLib.ErrCode.FAIL;
         }
     }
@@ -64,6 +67,7 @@ contract PPay is POSBase {
         Entries entries = getByStr(TABLE_NAME, "berth_id", berthId);
 
         if (entries.size() != 0) {
+            emit InsertRecordEvent(int256(POSLib.ErrCode.EXISTS), msg.sender);
             return POSLib.ErrCode.EXISTS;
         } else {
             return

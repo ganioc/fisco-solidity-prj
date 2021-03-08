@@ -1,26 +1,18 @@
-pragma solidity ^0.4.24;
+pragma solidity>=0.4.24 <0.6.11;
 
-// import "./POSLib.sol";
 import "./Table.sol";
 
-contract POSBase {
+contract TstBase{
     uint256 index;
 
-    // owner of contract
     address private owner;
 
-    // Location name 
     string internal LOC;
 
-    constructor(string loc)public{
+    constructor(string loc ) public {
         owner = msg.sender;
         index = 0;
         LOC = loc;
-    }
-
-    modifier isOwner() {
-        require(msg.sender == owner, "Caller is not owner");
-        _;
     }
 
     function getIndex() public view returns(uint256){
@@ -35,7 +27,6 @@ contract POSBase {
     function incIndex() internal{
         index++;
     }
-
     function getTableFactory() internal returns(TableFactory){
         return TableFactory(0x1001);
     }
@@ -58,5 +49,4 @@ contract POSBase {
         return table.select(LOC, condition);
 
     }
-
 }

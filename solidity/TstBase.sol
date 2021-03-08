@@ -1,52 +1,65 @@
-pragma solidity>=0.4.24 <0.6.11;
+pragma solidity >=0.4.24 <0.6.11;
 
 import "./Table.sol";
 
-contract TstBase{
+contract TstBase {
     uint256 index;
 
     address private owner;
 
     string internal LOC;
 
-    constructor(string loc ) public {
+    constructor(string loc) public {
         owner = msg.sender;
         index = 0;
         LOC = loc;
     }
 
-    function getIndex() public view returns(uint256){
+    function getIndex() public view returns (uint256) {
         return index;
     }
-    function getOwner() public view returns(address){
+
+    function getOwner() public view returns (address) {
         return owner;
     }
-    function getLoc() public view returns(string){
+
+    function getLoc() public view returns (string) {
         return LOC;
     }
-    function incIndex() internal{
+
+    function incIndex() internal {
         index++;
     }
-    function getTableFactory() internal returns(TableFactory){
+
+    function getTableFactory() internal returns (TableFactory) {
         return TableFactory(0x1001);
     }
+
     function openTable(string tableName) internal returns (Table) {
         return getTableFactory().openTable(tableName);
     }
-    function getByStr(string tableName,string column, string val) internal returns (Entries){
+
+    function getByStr(
+        string tableName,
+        /*string memory column,*/
+        string  val
+    ) internal returns (Entries) {
         Table table = openTable(tableName);
 
         Condition condition = table.newCondition();
-        condition.EQ(column, val);
-        return table.select(LOC, condition);
-
+        // condition.EQ(column, val);
+        return table.select(val, condition);
     }
-    function getByNum(string tableName,string column, int256 num) internal returns (Entries){
-        Table table = openTable(tableName);
 
-        Condition condition = table.newCondition();
-        condition.EQ(column, num);
-        return table.select(LOC, condition);
+    // function getByNum(
+    //     string tableName,
+    //     /*string memory column,*/
+    //     int256  num
+    // ) internal returns (Entries) {
+    //     Table table = openTable(tableName);
 
-    }
+    //     Condition condition = table.newCondition();
+    //     condition.EQ(column, num);
+    //     return table.select(LOC, condition);
+    // }
 }

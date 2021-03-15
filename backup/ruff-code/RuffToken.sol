@@ -1,51 +1,48 @@
 /**
  *Submitted for verification at Etherscan.io on 2018-01-11
-*/
+ */
 
 pragma solidity ^0.4.18;
 
 contract Ownable {
-  address public owner;
+    address public owner;
 
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
-  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    function Ownable() public {
+        owner = msg.sender;
+    }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 
-  function Ownable() public {
-    owner = msg.sender;
-  }
-
-
-
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-
-  function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));
-    OwnershipTransferred(owner, newOwner);
-    owner = newOwner;
-  }
-
+    function transferOwnership(address newOwner) public onlyOwner {
+        require(newOwner != address(0));
+        OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
 }
 
 contract ERC20Basic {
-  uint256 public totalSupply;
-  function balanceOf(address who) public view returns (uint256);
-  function transfer(address to, uint256 value) public returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-  
+    uint256 public totalSupply;
+
+    function balanceOf(address who) public view returns (uint256);
+
+    function transfer(address to, uint256 value) public returns (bool);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
 contract BasicToken is ERC20Basic, Ownable {
-
     using SafeMath for uint256;
     mapping(address => uint256) balances;
 
     bool public transfersEnabledFlag;
-
 
     modifier transfersEnabled() {
         require(transfersEnabledFlag);
@@ -56,8 +53,11 @@ contract BasicToken is ERC20Basic, Ownable {
         transfersEnabledFlag = true;
     }
 
-
-    function transfer(address _to, uint256 _value) transfersEnabled() public returns (bool) {
+    function transfer(address _to, uint256 _value)
+        public
+        transfersEnabled()
+        returns (bool)
+    {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
@@ -68,60 +68,69 @@ contract BasicToken is ERC20Basic, Ownable {
         return true;
     }
 
-
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
 }
 
-
-
-
-
 library SafeMath {
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    if (a == 0) {
-      return 0;
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+        uint256 c = a * b;
+        assert(c / a == b);
+        return c;
     }
-    uint256 c = a * b;
-    assert(c / a == b);
-    return c;
-  }
 
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-    return c;
-  }
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        // assert(b > 0); // Solidity automatically throws when dividing by 0
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+        return c;
+    }
 
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b <= a);
+        return a - b;
+    }
 
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        assert(c >= a);
+        return c;
+    }
 }
 
 contract ERC20 is ERC20Basic {
-  function allowance(address owner, address spender) public view returns (uint256);
-  function transferFrom(address from, address to, uint256 value) public returns (bool);
-  function approve(address spender, uint256 value) public returns (bool);
-  event Approval(address indexed owner, address indexed spender, uint256 value);
+    function allowance(address owner, address spender)
+        public
+        view
+        returns (uint256);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) public returns (bool);
+
+    function approve(address spender, uint256 value) public returns (bool);
+
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 }
 
-
 contract StandardToken is ERC20, BasicToken {
+    mapping(address => mapping(address => uint256)) internal allowed;
 
-    mapping (address => mapping (address => uint256)) internal allowed;
-
-
-
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    ) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
@@ -133,36 +142,44 @@ contract StandardToken is ERC20, BasicToken {
         return true;
     }
 
-
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
 
-
-    function allowance(address _owner, address _spender) public view returns (uint256) {
+    function allowance(address _owner, address _spender)
+        public
+        view
+        returns (uint256)
+    {
         return allowed[_owner][_spender];
     }
 
-    function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
-        allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
+    function increaseApproval(address _spender, uint256 _addedValue)
+        public
+        returns (bool)
+    {
+        allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(
+            _addedValue
+        );
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
-        uint oldValue = allowed[msg.sender][_spender];
+    function decreaseApproval(address _spender, uint256 _subtractedValue)
+        public
+        returns (bool)
+    {
+        uint256 oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
-        }
-        else {
+        } else {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-
 }
 
 contract MintableToken is StandardToken {
@@ -182,6 +199,7 @@ contract MintableToken is StandardToken {
         require(minters[msg.sender] || msg.sender == owner);
         _;
     }
+
     function addMinter(address _addr) public onlyOwner {
         minters[_addr] = true;
     }
@@ -190,8 +208,12 @@ contract MintableToken is StandardToken {
         delete minters[_addr];
     }
 
-
-    function mint(address _to, uint256 _amount) onlyMinters canMint public returns (bool) {
+    function mint(address _to, uint256 _amount)
+        public
+        onlyMinters
+        canMint
+        returns (bool)
+    {
         require(_to != address(0));
         totalSupply = totalSupply.add(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -200,17 +222,14 @@ contract MintableToken is StandardToken {
         return true;
     }
 
-    function finishMinting() onlyOwner canMint public returns (bool) {
+    function finishMinting() public onlyOwner canMint returns (bool) {
         mintingFinished = true;
         MintFinished();
         return true;
     }
 }
 
-
-
 contract CappedToken is MintableToken {
-
     uint256 public cap;
 
     function CappedToken(uint256 _cap) public {
@@ -218,15 +237,17 @@ contract CappedToken is MintableToken {
         cap = _cap;
     }
 
-
-    function mint(address _to, uint256 _amount) onlyMinters canMint public returns (bool) {
+    function mint(address _to, uint256 _amount)
+        public
+        onlyMinters
+        canMint
+        returns (bool)
+    {
         require(totalSupply.add(_amount) <= cap);
 
         return super.mint(_to, _amount);
     }
-
 }
-
 
 contract ParameterizedToken is CappedToken {
     string public name;
@@ -235,17 +256,78 @@ contract ParameterizedToken is CappedToken {
 
     uint256 public decimals;
 
-    function ParameterizedToken(string _name, string _symbol, uint256 _decimals, uint256 _capIntPart) public CappedToken(_capIntPart * 10 ** _decimals) {
+    function ParameterizedToken(
+        string _name,
+        string _symbol,
+        uint256 _decimals,
+        uint256 _capIntPart
+    ) public CappedToken(_capIntPart * 10**_decimals) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
     }
-
 }
 
-contract RuffToken is ParameterizedToken {
+contract HecoToken is ParameterizedToken {
+    address private _reserve; // account for reserve, receive heco token
 
-    function RuffToken() public ParameterizedToken("RUFF", "RUFF", 18, 2000000000) {
+    event ReserveModification(
+        address  previousReserve,
+        address  newReserve
+    );
+    event DepositEvent(address reserve, uint256 amount, string ruffAddr);
+    event WithdrawEvent(address reserve, uint256 amount, address to, string txHash);
+
+    function setReserve(address addr) public onlyOwner returns (bool) {
+        require(addr != address(0));
+        ReserveModification(_reserve, addr);
+        _reserve = addr;
+        
+        return true;
     }
 
+    function getReserve() public view returns (address) {
+        return _reserve;
+    }
+
+    // heco token -> RUFF
+    function depositTo(uint256 _value, string ruffAddr) public returns (bool) {
+        require(_reserve != address(0));
+        // SafeMath.sub will throw if there is not enough balance.
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_reserve] = balances[_reserve].add(_value);
+        DepositEvent(_reserve, _value, ruffAddr);
+        return true;
+    }
+
+    // RUFF -> heco token
+    // txHash -> tx hash on RuffChain
+    function withdrawTo(
+        address _to,
+        uint256 _value,
+        string txHash
+    ) public returns (bool) {
+        require(_reserve != address(0));
+        require(msg.sender == _reserve);
+
+        // SafeMath.sub will throw if there is not enough balance.
+        balances[_reserve] = balances[_reserve].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+
+        WithdrawEvent(_reserve, _value, _to, txHash);
+        return true;
+    }
+
+    function HecoToken(
+        string _name,
+        string _symbol,
+        uint256 _decimals,
+        uint256 _capIntPart
+    ) public ParameterizedToken(_name, _symbol, _decimals, _capIntPart) {
+        _reserve = address(0);
+    }
+}
+
+contract RuffToken is HecoToken {
+    function RuffToken() public HecoToken("RUFF", "RUFF", 18, 2000000000) {}
 }

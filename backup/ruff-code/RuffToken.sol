@@ -12,7 +12,7 @@ contract Ownable {
         address indexed newOwner
     );
 
-    function Ownable() public {
+    constructor() public {
         owner = msg.sender;
     }
 
@@ -23,7 +23,7 @@ contract Ownable {
 
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
-        OwnershipTransferred(owner, newOwner);
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
 }
@@ -64,7 +64,7 @@ contract BasicToken is ERC20Basic, Ownable {
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -138,13 +138,13 @@ contract StandardToken is ERC20, BasicToken {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
@@ -163,7 +163,7 @@ contract StandardToken is ERC20, BasicToken {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(
             _addedValue
         );
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
@@ -177,7 +177,7 @@ contract StandardToken is ERC20, BasicToken {
         } else {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 }
@@ -217,14 +217,14 @@ contract MintableToken is StandardToken {
         require(_to != address(0));
         totalSupply = totalSupply.add(_amount);
         balances[_to] = balances[_to].add(_amount);
-        Mint(_to, _amount);
-        Transfer(address(0), _to, _amount);
+        emit Mint(_to, _amount);
+        emit Transfer(address(0), _to, _amount);
         return true;
     }
 
     function finishMinting() public onlyOwner canMint returns (bool) {
         mintingFinished = true;
-        MintFinished();
+       emit  MintFinished();
         return true;
     }
 }
@@ -232,7 +232,7 @@ contract MintableToken is StandardToken {
 contract CappedToken is MintableToken {
     uint256 public cap;
 
-    function CappedToken(uint256 _cap) public {
+    constructor(uint256 _cap) public {
         require(_cap > 0);
         cap = _cap;
     }
@@ -256,7 +256,7 @@ contract ParameterizedToken is CappedToken {
 
     uint256 public decimals;
 
-    function ParameterizedToken(
+    constructor(
         string _name,
         string _symbol,
         uint256 _decimals,
@@ -280,7 +280,7 @@ contract HecoToken is ParameterizedToken {
 
     function setReserve(address addr) public onlyOwner returns (bool) {
         require(addr != address(0));
-        ReserveModification(_reserve, addr);
+        emit ReserveModification(_reserve, addr);
         _reserve = addr;
         
         return true;
@@ -296,7 +296,7 @@ contract HecoToken is ParameterizedToken {
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_reserve] = balances[_reserve].add(_value);
-        DepositEvent(_reserve, _value, ruffAddr);
+        emit DepositEvent(_reserve, _value, ruffAddr);
         return true;
     }
 
@@ -314,11 +314,11 @@ contract HecoToken is ParameterizedToken {
         balances[_reserve] = balances[_reserve].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
-        WithdrawEvent(_reserve, _value, _to, txHash);
+        emit WithdrawEvent(_reserve, _value, _to, txHash);
         return true;
     }
 
-    function HecoToken(
+   constructor(
         string _name,
         string _symbol,
         uint256 _decimals,
@@ -329,5 +329,5 @@ contract HecoToken is ParameterizedToken {
 }
 
 contract RuffToken is HecoToken {
-    function RuffToken() public HecoToken("RUFF", "RUFF", 18, 2000000000) {}
+    constructor() public HecoToken("RUFF", "RUFF", 18, 2000000000) {}
 }

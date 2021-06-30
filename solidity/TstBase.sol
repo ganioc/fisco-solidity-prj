@@ -42,7 +42,7 @@ contract TstBase {
     function getByStr(
         string tableName,
         /*string memory column,*/
-        string  val
+        string val
     ) internal returns (Entries) {
         Table table = openTable(tableName);
 
@@ -51,15 +51,15 @@ contract TstBase {
         return table.select(val, condition);
     }
 
-    // function getByNum(
-    //     string tableName,
-    //     /*string memory column,*/
-    //     int256  num
-    // ) internal returns (Entries) {
-    //     Table table = openTable(tableName);
+    function getByNum(
+        string tableName,
+        string memory column,
+        int256 num
+    ) internal returns (Entries) {
+        Table table = openTable(tableName);
 
-    //     Condition condition = table.newCondition();
-    //     condition.EQ(column, num);
-    //     return table.select(LOC, condition);
-    // }
+        Condition condition = table.newCondition();
+        condition.EQ(column, num);
+        return table.select(LOC, condition);
+    }
 }

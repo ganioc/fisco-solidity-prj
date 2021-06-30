@@ -4,11 +4,11 @@ import "./Table.sol";
 import "./TstBase.sol";
 import "./POSLib.sol";
 
-contract TstOut is TstBase{
+contract TstOut is TstBase {
     using POSLib for POSLib.ErrCode;
     event InsertRecordEvent(int256 ret, address account);
 
-    string  TABLE_NAME = "pos_out";
+    string TABLE_NAME = "pos_out";
 
     constructor(string loc) TstBase(loc) {
         createTable(loc);
@@ -22,6 +22,7 @@ contract TstOut is TstBase{
             "index,out_time,should_pay_money,id,out_pic_hash"
         );
     }
+
     function _insert(
         string berthId,
         string outTime,
@@ -40,7 +41,7 @@ contract TstOut is TstBase{
         entry.set("out_pic_hash", outPicHash);
 
         if (table.insert(berthId, entry) == 1) {
-             emit InsertRecordEvent(int256(POSLib.ErrCode.OK), msg.sender);
+            emit InsertRecordEvent(int256(POSLib.ErrCode.OK), msg.sender);
             return POSLib.ErrCode.OK;
         } else {
             emit InsertRecordEvent(int256(POSLib.ErrCode.FAIL), msg.sender);
@@ -61,14 +62,7 @@ contract TstOut is TstBase{
             emit InsertRecordEvent(int256(POSLib.ErrCode.EXISTS), msg.sender);
             return POSLib.ErrCode.EXISTS;
         } else {
-            return
-                _insert(
-                    berthId,
-                    outTime,
-                    shouldPayMoney,
-                    id,
-                    outPicHash
-                );
+            return _insert(berthId, outTime, shouldPayMoney, id, outPicHash);
         }
     }
 
@@ -91,6 +85,36 @@ contract TstOut is TstBase{
                 entry.getString("berth_id"),
                 entry.getString("out_time"),
                 int256(entry.getInt("should_pay_money")),
+                entry.getString("id"),
+                entry.getString("out_pic_hash")
+            );
+        }
+    }
+
+    function getByIndex(uint256 mIndex)
+        public
+        returns (
+            string,
+            string,
+            int256,
+            string,
+            string
+        )
+    {
+        if (mIndex < 0 || uint256(mIndex) >= index) {
+            return ("", "", 0, "", "");
+        }
+        Entries entries = getByNum(TABLE_NAME, "index", mIndex);
+
+        if (entries.size() == 0) {
+            return ("", "", 0, "", "");
+        } else {
+            Entry entry = entries.get(0);
+            return (
+                entry.getString("berth_id"),
+                entry.getString("out_time"),
+                int256(entry.getInt("should_pay_money")),
+                ,
                 entry.getString("id"),
                 entry.getString("out_pic_hash")
             );

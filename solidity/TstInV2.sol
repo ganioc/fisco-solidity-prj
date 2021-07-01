@@ -1,17 +1,22 @@
 pragma solidity ^0.4.24;
 
+/**
+Change table structure, using the same key value, "table_id"
+
+ */
+
 import "./Table.sol";
-import "./TstBase.sol";
+import "./TstBaseV2.sol";
 import "./POSLib.sol";
 
-contract TstIn is TstBase {
+contract TstInV2 is TstBaseV2 {
     using POSLib for POSLib.ErrCode;
 
     event InsertRecordEvent(int256 ret, address account);
 
     string TABLE_NAME = "pos_in";
 
-    constructor(string loc) TstBase(loc) {
+    constructor(string loc) TstBaseV2(loc) {
         createTable(loc);
         TABLE_NAME = loc;
     }
@@ -19,8 +24,8 @@ contract TstIn is TstBase {
     function createTable(string loc) private {
         getTableFactory().createTable(
             loc,
-            "berth_id",
-            "index,in_time,in_time_type,in_type,plate_id,prepay_len,prepay_money,vehicle_type,in_pic_hash"
+            "table_id",
+            "berth_id,index,in_time,in_time_type,in_type,plate_id,prepay_len,prepay_money,vehicle_type,in_pic_hash"
         );
     }
 
@@ -37,6 +42,7 @@ contract TstIn is TstBase {
     ) private returns (POSLib.ErrCode) {
         Table table = openTable(TABLE_NAME);
         Entry entry = table.newEntry();
+        entry.set("table_id", TABLE_NAME);
         entry.set("berth_id", berthId);
         entry.set("index", index);
         incIndex();
@@ -49,7 +55,7 @@ contract TstIn is TstBase {
         entry.set("vehicle_type", vehicleType);
         entry.set("in_pic_hash", inPicHash);
 
-        if (table.insert(berthId, entry) == 1) {
+        if (table.insert(TABLE_NAME, entry) == 1) {
             emit InsertRecordEvent(int256(POSLib.ErrCode.OK), msg.sender);
             return POSLib.ErrCode.OK;
         } else {
@@ -69,11 +75,7 @@ contract TstIn is TstBase {
         int256 vehicleType,
         string inPicHash
     ) public returns (POSLib.ErrCode) {
-        Entries entries = getByStr(
-            TABLE_NAME,
-            /*"berth_id",*/
-            berthId
-        );
+        Entries entries = getByStr(TABLE_NAME, berthId);
 
         if (index == 0 || uint256(entries.size()) == 0) {
             return
@@ -108,11 +110,7 @@ contract TstIn is TstBase {
             string
         )
     {
-        Entries entries = getByStr(
-            TABLE_NAME,
-            /*"berth_id",*/
-            berthId
-        );
+        Entries entries = getByStr(TABLE_NAME, berthId);
         if (entries.size() == 0) {
             return ("", "", 0, 0, "", 0, 0, 0, "");
         } else {
@@ -130,7 +128,7 @@ contract TstIn is TstBase {
             );
         }
     }
-    /*
+
     function getByIndex(uint256 mIndex)
         public
         returns (
@@ -148,7 +146,7 @@ contract TstIn is TstBase {
         if (mIndex < 0 || uint256(mIndex) >= index) {
             return ("", "", 0, 0, "", 0, 0, 0, "");
         }
-        Entries entries = getByNum(TABLE_NAME, "index", mIndex);
+        Entries entries = getByNum(TABLE_NAME, mIndex);
 
         if (entries.size() == 0) {
             return ("", "", 0, 0, "", 0, 0, 0, "");
@@ -167,5 +165,4 @@ contract TstIn is TstBase {
             );
         }
     }
-    */
 }

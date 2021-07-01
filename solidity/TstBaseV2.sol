@@ -2,7 +2,7 @@ pragma solidity >=0.4.24 <0.6.11;
 
 import "./Table.sol";
 
-contract TstBase {
+contract TstBaseV2 {
     uint256 index;
 
     address private owner;
@@ -39,28 +39,22 @@ contract TstBase {
         return getTableFactory().openTable(tableName);
     }
 
-    function getByStr(
-        string tableName,
-        /*string memory column,*/
-        string val
-    ) internal returns (Entries) {
+    function getByStr(string tableName, string val) internal returns (Entries) {
         Table table = openTable(tableName);
 
         Condition condition = table.newCondition();
-        // condition.EQ(column, val);
-        return table.select(val, condition);
+        condition.EQ("birth_id", val);
+        return table.select(tableName, condition);
     }
-    /*
-    function getByNum(
-        string tableName,
-        string memory column,
-        int256 num
-    ) internal returns (Entries) {
+
+    function getByNum(string tableName, uint256 num)
+        internal
+        returns (Entries)
+    {
         Table table = openTable(tableName);
 
         Condition condition = table.newCondition();
-        condition.EQ(column, num);
-        return table.select(LOC, condition);
+        condition.EQ("index", int256(num));
+        return table.select(tableName, condition);
     }
-    */
 }

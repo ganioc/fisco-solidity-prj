@@ -1,16 +1,16 @@
 pragma solidity ^0.4.24;
 
 import "./Table.sol";
-import "./TstBase.sol";
+import "./TstBaseV2.sol";
 import "./POSLib.sol";
 
-contract TstPay is TstBase {
+contract TstPayV2 is TstBaseV2 {
     using POSLib for POSLib.ErrCode;
     event InsertRecordEvent(int256 ret, address account);
 
     string TABLE_NAME = "pos_pay";
 
-    constructor(string loc) TstBase(loc) {
+    constructor(string loc) TstBaseV2(loc) {
         createTable(loc);
         TABLE_NAME = loc;
     }
@@ -18,8 +18,8 @@ contract TstPay is TstBase {
     function createTable(string loc) private {
         getTableFactory().createTable(
             loc,
-            "berth_id",
-            "index,amount,mode,parking_actual_pay_money,parking_record_id,prepay_len,should_pay_amount,zero_owe"
+            "table_id",
+            "berth_id,index,amount,mode,parking_actual_pay_money,parking_record_id,prepay_len,should_pay_amount,zero_owe"
         );
     }
 
@@ -35,6 +35,7 @@ contract TstPay is TstBase {
     ) private returns (POSLib.ErrCode) {
         Table table = openTable(TABLE_NAME);
         Entry entry = table.newEntry();
+        entry.set("table_id", TABLE_NAME);
         entry.set("berth_id", berthId);
         entry.set("index", index);
         incIndex();
@@ -46,7 +47,7 @@ contract TstPay is TstBase {
         entry.set("should_pay_amount", shouldPayAmount);
         entry.set("zero_owe", zeroOwe);
 
-        if (table.insert(berthId, entry) == 1) {
+        if (table.insert(TABLE_NAME, entry) == 1) {
             emit InsertRecordEvent(int256(POSLib.ErrCode.OK), msg.sender);
             return POSLib.ErrCode.OK;
         } else {
@@ -115,7 +116,7 @@ contract TstPay is TstBase {
             );
         }
     }
-    /*
+
     function getByIndex(uint256 mIndex)
         public
         returns (
@@ -132,7 +133,7 @@ contract TstPay is TstBase {
         if (mIndex < 0 || uint256(mIndex) >= index) {
             return ("", 0, 0, 0, "", 0, 0, 0);
         }
-        Entries entries = getByNum(TABLE_NAME, "index", mIndex);
+        Entries entries = getByNum(TABLE_NAME, mIndex);
 
         if (entries.size() == 0) {
             return ("", 0, 0, 0, "", 0, 0, 0);
@@ -150,5 +151,4 @@ contract TstPay is TstBase {
             );
         }
     }
-    */
 }

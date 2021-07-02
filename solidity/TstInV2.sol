@@ -154,7 +154,7 @@ contract TstInV2 is TstBaseV2 {
             Entry entry = entries.get(0);
             return (
                 entry.getString("berth_id"),
-                entry.getString("in_itme"),
+                entry.getString("in_time"),
                 int256(entry.getInt("in_time_type")),
                 int256(entry.getInt("in_type")),
                 entry.getString("plate_id"),

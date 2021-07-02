@@ -43,7 +43,7 @@ contract TstBaseV2 {
         Table table = openTable(tableName);
 
         Condition condition = table.newCondition();
-        condition.EQ("birth_id", val);
+        condition.EQ("berth_id", val);
         return table.select(tableName, condition);
     }
 

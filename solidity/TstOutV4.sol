@@ -5,6 +5,13 @@ import "./TstBaseV4.sol";
 import "./POSLib.sol";
 
 contract TstOutV4 is TstBaseV4 {
+    struct OutRecord {
+        string berthId;
+        int256 outTime;
+        int256 shouldPayMoney;
+        string id;
+        string outPicHash;
+    }
     using POSLib for POSLib.ErrCode;
     event InsertRecordEvent(int256 ret, address account);
 
@@ -25,7 +32,7 @@ contract TstOutV4 is TstBaseV4 {
 
     function _insert(
         string berthId,
-        string outTime,
+        int256 outTime,
         int256 shouldPayMoney,
         string id,
         string outPicHash
@@ -52,7 +59,7 @@ contract TstOutV4 is TstBaseV4 {
 
     function insertRecord(
         string berthId,
-        string outTime,
+        int256 outTime,
         int256 shouldPayMoney,
         string id,
         string outPicHash
@@ -71,7 +78,7 @@ contract TstOutV4 is TstBaseV4 {
         public
         returns (
             string,
-            string,
+            int256,
             int256,
             string,
             string
@@ -79,12 +86,12 @@ contract TstOutV4 is TstBaseV4 {
     {
         Entries entries = getByStr(TABLE_NAME, berthId);
         if (uint256(entries.size()) == 0) {
-            return ("", "", 0, "", "");
+            return ("", 0, 0, "", "");
         } else {
             Entry entry = entries.get(0);
             return (
                 entry.getString("berth_id"),
-                entry.getString("out_time"),
+                int256(entry.getInt("out_time")),
                 int256(entry.getInt("should_pay_money")),
                 entry.getString("id"),
                 entry.getString("out_pic_hash")
@@ -96,24 +103,24 @@ contract TstOutV4 is TstBaseV4 {
         public
         returns (
             string,
-            string,
+            int256,
             int256,
             string,
             string
         )
     {
         if (mIndex < 0 || uint256(mIndex) >= index) {
-            return ("", "", 0, "", "");
+            return ("", 0, 0, "", "");
         }
         Entries entries = getByNum(TABLE_NAME, mIndex);
 
         if (entries.size() == 0) {
-            return ("", "", 0, "", "");
+            return ("", 0, 0, "", "");
         } else {
             Entry entry = entries.get(0);
             return (
                 entry.getString("berth_id"),
-                entry.getString("out_time"),
+                int256(entry.getInt("out_time")),
                 int256(entry.getInt("should_pay_money")),
                 entry.getString("id"),
                 entry.getString("out_pic_hash")

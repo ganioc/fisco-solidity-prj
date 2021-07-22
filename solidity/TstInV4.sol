@@ -193,6 +193,8 @@ contract TstInV4 is TstBaseV4 {
             string[] memory
         )
     {
+        int256 count = getRecordCount(TABLE_NAME, "in_time", start, end);
+
         Entries entries = getRecordBase(
             TABLE_NAME,
             offset,
@@ -202,21 +204,10 @@ contract TstInV4 is TstBaseV4 {
             end
         );
         string[] memory lst = new string[](uint256(entries.size()) * 9);
-        // int256[] memory in_times = new int256[](count);
 
         for (uint256 i = 0; i < uint256(entries.size()); i++) {
             Entry entry = entries.get(int256(i));
-            // records[i] = InRecord(
-            //     entry.getString("berth_id"),
-            //     int256(entry.getInt("in_time")),
-            //     int256(entry.getInt("in_time_type")),
-            //     int256(entry.getInt("in_type")),
-            //     entry.getString("plate_id"),
-            //     int256(entry.getInt("prepay_len")),
-            //     int256(entry.getInt("prepay_money")),
-            //     int256(entry.getInt("vehicle_type")),
-            //     entry.getString("in_pic_hash")
-            // );
+
             lst[i * 9] = entry.getString("berth_id");
             lst[i * 9 + 1] = uintToString(uint256(entry.getInt("in_time")));
             lst[i * 9 + 2] = uintToString(
@@ -234,6 +225,6 @@ contract TstInV4 is TstBaseV4 {
             lst[i * 9 + 8] = entry.getString("in_pic_hash");
         }
 
-        return (offset, size, entries.size(), lst);
+        return (offset, size, count, lst);
     }
 }

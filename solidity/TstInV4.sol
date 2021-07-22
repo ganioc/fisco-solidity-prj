@@ -184,7 +184,15 @@ contract TstInV4 is TstBaseV4 {
         int256 size,
         int256 start,
         int256 end
-    ) public returns (string[] memory) {
+    )
+        public
+        returns (
+            int256,
+            int256,
+            int256,
+            string[] memory
+        )
+    {
         Entries entries = getRecordBase(
             TABLE_NAME,
             offset,
@@ -193,12 +201,10 @@ contract TstInV4 is TstBaseV4 {
             start,
             end
         );
-        uint256 count = uint256(entries.size());
-        // records = new InRecord[](count);
-        string[] memory ids = new string[](count);
+        string[] memory lst = new string[](uint256(entries.size()) * 9);
         // int256[] memory in_times = new int256[](count);
 
-        for (uint256 i = 0; i < count; i++) {
+        for (uint256 i = 0; i < uint256(entries.size()); i++) {
             Entry entry = entries.get(int256(i));
             // records[i] = InRecord(
             //     entry.getString("berth_id"),
@@ -211,11 +217,23 @@ contract TstInV4 is TstBaseV4 {
             //     int256(entry.getInt("vehicle_type")),
             //     entry.getString("in_pic_hash")
             // );
-            ids[i] = entry.getString("berth_id");
-            // in_times[i] = int256(entry.getInt("in_time"));
+            lst[i * 9] = entry.getString("berth_id");
+            lst[i * 9 + 1] = uintToString(uint256(entry.getInt("in_time")));
+            lst[i * 9 + 2] = uintToString(
+                uint256(entry.getInt("in_time_type"))
+            );
+            lst[i * 9 + 3] = uintToString(uint256(entry.getInt("in_type")));
+            lst[i * 9 + 4] = entry.getString("plate_id");
+            lst[i * 9 + 5] = uintToString(uint256(entry.getInt("prepay_len")));
+            lst[i * 9 + 6] = uintToString(
+                uint256(entry.getInt("prepay_money"))
+            );
+            lst[i * 9 + 7] = uintToString(
+                uint256(entry.getInt("vehicle_type"))
+            );
+            lst[i * 9 + 8] = entry.getString("in_pic_hash");
         }
-        //return records;
-        // in_times
-        return ids;
+
+        return (offset, size, entries.size(), lst);
     }
 }

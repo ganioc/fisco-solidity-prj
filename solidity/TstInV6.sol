@@ -22,7 +22,7 @@ contract TstInV6 is TstBaseV6 {
         int256 vehicle_type;
         string in_pic_hash;
     }
-    struct InterStruct {
+    struct RecordStruct {
         int256 count;
         string[] lst;
     }
@@ -306,16 +306,14 @@ contract TstInV6 is TstBaseV6 {
     }
 
     function interGetRecordByPlateId(
-        string columnName,
         string val,
-        string colTimeName,
         int256 start,
         int256 end,
         int256 offset,
         int256 size
-    ) internal returns (InterStruct memory) {
+    ) internal returns (RecordStruct memory) {
         return (
-            InterStruct(
+            RecordStruct(
                 getRecordCountByPlateId(val, start, end),
                 entriesToList(
                     interGetRecordBaseByCol(val, start, end, offset, size)
@@ -347,40 +345,13 @@ contract TstInV6 is TstBaseV6 {
                 end > 0 &&
                 start < end
         );
-        InterStruct memory data = interGetRecordByPlateId(
-            "plate_id",
+        RecordStruct memory data = interGetRecordByPlateId(
             plateId,
-            "in_time",
             start,
             end,
             offset,
             size
         );
-        return (
-            offset,
-            size,
-            data.count,
-            data.lst
-            // getRecordCountByCol(
-            //     TABLE_NAME,
-            //     "plate_id",
-            //     plateId,
-            //     "in_time",
-            //     start,
-            //     end
-            // ),
-            // entriesToList(
-            //     getRecordBaseByCol(
-            //         TABLE_NAME,
-            //         "plate_id",
-            //         plateId,
-            //         "in_time",
-            //         start,
-            //         end,
-            //         offset,
-            //         size
-            //     )
-            // )
-        );
+        return (offset, size, data.count, data.lst);
     }
 }

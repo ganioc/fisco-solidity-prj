@@ -47,6 +47,18 @@ contract TstBaseV6 {
         return table.select(tableName, condition);
     }
 
+    function getByCol(
+        string tableName,
+        string colName,
+        string val
+    ) internal returns (Entries) {
+        Table table = openTable(tableName);
+
+        Condition condition = table.newCondition();
+        condition.EQ(colName, val);
+        return table.select(tableName, condition);
+    }
+
     function getByNum(string tableName, uint256 num)
         internal
         returns (Entries)

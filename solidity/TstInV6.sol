@@ -148,6 +148,39 @@ contract TstInV6 is TstBaseV6 {
         }
     }
 
+    function getByPlateId(string plateId)
+        public
+        returns (
+            string,
+            int256,
+            int256,
+            int256,
+            string,
+            int256,
+            int256,
+            int256,
+            string
+        )
+    {
+        Entries entries = getByCol(TABLE_NAME, "plate_id", plateId);
+        if (entries.size() == 0) {
+            return ("", 0, 0, 0, "", 0, 0, 0, "");
+        } else {
+            Entry entry = entries.get(0);
+            return (
+                entry.getString("berth_id"),
+                int256(entry.getInt("in_time")),
+                int256(entry.getInt("in_time_type")),
+                int256(entry.getInt("in_type")),
+                entry.getString("plate_id"),
+                int256(entry.getInt("prepay_len")),
+                int256(entry.getInt("prepay_money")),
+                int256(entry.getInt("vehicle_type")),
+                entry.getString("in_pic_hash")
+            );
+        }
+    }
+
     function getByIndex(uint256 mIndex)
         public
         returns (
@@ -273,7 +306,7 @@ contract TstInV6 is TstBaseV6 {
         string plateId,
         int256 start,
         int256 end
-    ) internal returns (int256) {
+    ) public returns (int256) {
         return
             getRecordCountByCol(
                 TABLE_NAME,

@@ -2,7 +2,7 @@ pragma solidity >=0.4.24 <0.6.11;
 
 import "./Table.sol";
 
-contract TstBaseV5 {
+contract TstBaseV6 {
     uint256 index;
 
     address private owner;
@@ -120,24 +120,7 @@ contract TstBaseV5 {
         int256 end,
         int256 offset,
         int256 size
-    )
-        internal
-        returns (
-            int256,
-            int256,
-            int256,
-            Entries
-        )
-    {
-        int256 total = getRecordCountByCol(
-            tableName,
-            columnName,
-            val,
-            colTimeName,
-            start,
-            end
-        );
-
+    ) internal returns (Entries) {
         Table table = openTable(tableName);
 
         Condition condition = table.newCondition();
@@ -147,7 +130,7 @@ contract TstBaseV5 {
         condition.limit(offset, size);
         Entries entries = table.select(tableName, condition);
 
-        return (offset, size, total, entries);
+        return (entries);
     }
 
     function uintToString(uint256 v) internal constant returns (string str) {
